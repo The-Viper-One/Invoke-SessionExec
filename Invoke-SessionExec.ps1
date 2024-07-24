@@ -1,4 +1,34 @@
 function Invoke-SessionExec {
+
+<#
+.SYNOPSIS
+Executes a specified command within a a user logon session.
+
+.DESCRIPTION
+The Invoke-SessionExec function allows you to run commands within a specific user session by utilizing Windows API calls. 
+This function requires SYSTEM privileges and is capable of targeting all sessions or a specific session identified by Session ID. 
+It sets up necessary security attributes, pipes, and handles to facilitate command execution and captures the output from the session.
+
+.PARAMETER SessionID
+Specifies the session ID where the command should be executed. If set to "All", the command will be executed in all active sessions.
+
+.PARAMETER Command
+The command to execute within the specified session.
+
+.EXAMPLE
+Invoke-SessionExec -SessionID 1 -Command "whoami /all"
+
+Executes the "whoami /all" command in the session with ID 1.
+
+.EXAMPLE
+Invoke-SessionExec -SessionID "All" -Command "whoami /all"
+
+Executes the "whoami /all" command in all active sessions, excluding the current session.
+
+.NOTES
+Requires SYSTEM privileges to execute successfully.
+#>
+
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -8,6 +38,9 @@ function Invoke-SessionExec {
         [ValidateNotNullOrEmpty()]
         [string]$Command
     )
+
+     if (-not ([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value -eq "S-1-5-18")) { Write-Output "[-] Not running as SYSTEM" ; return }
+
 
     if (-not [System.Management.Automation.PSTypeName]'NativeMethods'.Type) {
         Add-Type -TypeDefinition @"
@@ -217,5 +250,3 @@ function Invoke-SessionExec {
         } 
     }
 }
-
-#Invoke-SessionExec -SessionID All -command whoami
