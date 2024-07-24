@@ -29,7 +29,7 @@ security\arbiter
 
 # Load into memory
 
-```powershell
+```
 iex(new-object net.webclient).downloadstring('https://raw.githubusercontent.com/The-Viper-One/Invoke-SessionExec/main/Invoke-SessionExec.ps1')
 ```
 
